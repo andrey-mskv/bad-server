@@ -4,40 +4,53 @@ import cors from 'cors'
 import 'dotenv/config'
 import express, { json, urlencoded } from 'express'
 import mongoose from 'mongoose'
+
 import path from 'path'
 import { DB_ADDRESS } from './config'
 import errorHandler from './middlewares/error-handler'
-import serveStatic from './middlewares/serverStatic'
+// import serveStatic from './middlewares/serverStatic'
 import routes from './routes'
-import helmet, { contentSecurityPolicy } from 'helmet'
+import helmet from 'helmet'
+import csrf from 'csurf'
 
 const { PORT = 3000 } = process.env
 const ORIGIN_ALLOW = process.env.ORIGIN_ALLOW
+
 const app = express()
 
 // helmet(CSP) - от XSS атак
-// app.use(helmet())
-// app.use(
-//     helmet({
-//         contentSecurityPolicy: {
-//             directives: {
-//                 defaultSrc: ["'self'"],
-//                 imgSrc: ["'self'", "http://localhost:3000"],
-//             },
-//         },
-//     })
-// )
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                imgSrc: ["'self'", 'data:'],
+                scriptSrc: ["'self'"],
+                styleSrc: ["'self'"],
+                fontSrc: ["'self'"],
+            },
+        },
+    })
+)
 
-app.use(cors({ origin: ORIGIN_ALLOW, credentials: true }));
-// app.use(cors())
+// CORS
+app.use(
+    cors({
+        origin: ORIGIN_ALLOW || 'http://localhost:3000',
+        credentials: true,
+        optionsSuccessStatus: 200,
+    })
+)
 
 app.use(cookieParser())
-
-// app.use(express.static(path.join(__dirname, 'public'))); // статика для docker
-app.use(serveStatic(path.join(__dirname, 'public'))) // статика для локальной разработки
-
+const csrfProtection = csrf({ cookie: true });
 app.use(urlencoded({ extended: true }))
 app.use(json())
+app.use(express.static(path.join(__dirname, 'public'))) // статика для docker
+
+app.get('/csrf-token', csrfProtection, (req, res) => {
+    res.json({ csrfToken: req.csrfToken() });
+});
 
 app.options('*', cors())
 app.use(routes)

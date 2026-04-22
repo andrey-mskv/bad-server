@@ -9,7 +9,8 @@
         "build": "tsc",
         "dev": "npx nodemon -L src/app.ts ",
         "start": "ts-node src/app.ts",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "test:e2e": "bash /tmp/tests-bad-server/bin/run.sh"
     },
     "author": "< Укажите здесь автора работы >",
     "license": "ISC",
@@ -37,14 +38,16 @@
     },
     "dependencies": {
         "@faker-js/faker": "^8.4.1",
+        "@types/csurf": "^1.11.5",
         "@types/helmet": "^0.0.48",
         "@types/jsonwebtoken": "^9.0.6",
         "bcryptjs": "^2.4.3",
         "celebrate": "^15.0.3",
-        "cookie-parser": "^1.4.6",
+        "cookie-parser": "^1.4.7",
         "cors": "^2.8.5",
+        "csurf": "^1.11.0",
         "dotenv": "^16.4.5",
-        "express": "^4.19.2",
+        "express": "^4.22.1",
         "helmet": "^8.1.0",
         "jsonwebtoken": "^9.0.2",
         "md5": "^2.3.0",
