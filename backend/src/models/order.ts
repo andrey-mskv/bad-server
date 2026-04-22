@@ -14,7 +14,7 @@ export enum StatusType {
 
 export interface IOrder extends Document {
     id: Types.ObjectId
-    orderNumber: number
+    orderNumber: number | string
     status: string
     totalAmount: number
     products: Types.ObjectId[]
@@ -72,25 +72,25 @@ const orderSchema: Schema = new Schema(
     { versionKey: false, timestamps: true }
 )
 
-orderSchema.pre('save', async function incrementOrderNumber(next) {
-    const order = this
+orderSchema.pre('save', async function() {
+    // const order = this
 
-    if (order.isNew) {
+    if (this.isNew) {
         const counter = await Counter.findOneAndUpdate(
             {},
             { $inc: { sequenceValue: 1 } },
             { new: true, upsert: true }
         )
 
-        order.orderNumber = counter.sequenceValue
+        this.orderNumber = counter.sequenceValue
     }
 
-    next()
+    // next()
 })
 
 orderSchema.post('save', async function updateUserStats(doc) {
     await User.findById(doc.customer).then(function updateUser(user) {
-        user?.orders.push(doc.id)
+        user?.orders.push(doc._id as Types.ObjectId)
         user?.calculateOrderStats()
     })
 })

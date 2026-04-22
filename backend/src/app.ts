@@ -16,21 +16,25 @@ const ORIGIN_ALLOW = process.env.ORIGIN_ALLOW
 const app = express()
 
 // helmet(CSP) - от XSS атак
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        imgSrc: ["'self'", 'data:'],
-      },
-    },
-  })
-)
+// app.use(helmet())
+// app.use(
+//     helmet({
+//         contentSecurityPolicy: {
+//             directives: {
+//                 defaultSrc: ["'self'"],
+//                 imgSrc: ["'self'", "http://localhost:3000"],
+//             },
+//         },
+//     })
+// )
 
 app.use(cors({ origin: ORIGIN_ALLOW, credentials: true }));
+// app.use(cors())
 
 app.use(cookieParser())
 
-app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public'))); // статика для docker
+app.use(serveStatic(path.join(__dirname, 'public'))) // статика для локальной разработки
 
 app.use(urlencoded({ extended: true }))
 app.use(json())

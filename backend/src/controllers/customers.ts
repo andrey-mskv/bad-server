@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { FilterQuery } from 'mongoose'
+import { QueryFilter } from 'mongoose'
 import NotFoundError from '../errors/not-found-error'
 import Order from '../models/order'
 import User, { IUser } from '../models/user'
@@ -14,10 +14,13 @@ export const getCustomers = async (
 ) => {
     try {
         const {
+            // Пагинация
             page = 1,
             limit = 10,
+            // Сортировка
             sortField = 'createdAt',
             sortOrder = 'desc',
+            // Фильтрация
             registrationDateFrom,
             registrationDateTo,
             lastOrderDateFrom,
@@ -29,7 +32,7 @@ export const getCustomers = async (
             search,
         } = req.query
 
-        const filters: FilterQuery<Partial<IUser>> = {}
+        const filters: QueryFilter<Partial<IUser>> = {}
 
         if (registrationDateFrom) {
             filters.createdAt = {
@@ -46,10 +49,11 @@ export const getCustomers = async (
                 $lte: endOfDay,
             }
         }
+        
 
         if (lastOrderDateFrom) {
             filters.lastOrderDate = {
-                ...filters.lastOrderDate,
+                ...(filters.lastOrderDate as Record<string, any> ?? {}),
                 $gte: new Date(lastOrderDateFrom as string),
             }
         }
@@ -58,35 +62,35 @@ export const getCustomers = async (
             const endOfDay = new Date(lastOrderDateTo as string)
             endOfDay.setHours(23, 59, 59, 999)
             filters.lastOrderDate = {
-                ...filters.lastOrderDate,
+                ...(filters.lastOrderDate as Record<string, any> ?? {}),
                 $lte: endOfDay,
             }
         }
 
         if (totalAmountFrom) {
             filters.totalAmount = {
-                ...filters.totalAmount,
+                ...(filters.totalAmount as Record<string, any> ?? {}),
                 $gte: Number(totalAmountFrom),
             }
         }
 
         if (totalAmountTo) {
             filters.totalAmount = {
-                ...filters.totalAmount,
+                ...(filters.totalAmount as Record<string, any> ?? {}),
                 $lte: Number(totalAmountTo),
             }
         }
 
         if (orderCountFrom) {
             filters.orderCount = {
-                ...filters.orderCount,
+                ...(filters.orderCount as Record<string, any> ?? {}),
                 $gte: Number(orderCountFrom),
             }
         }
 
         if (orderCountTo) {
             filters.orderCount = {
-                ...filters.orderCount,
+                ...(filters.orderCount as Record<string, any> ?? {}),
                 $lte: Number(orderCountTo),
             }
         }

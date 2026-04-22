@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
-import { FilterQuery, Error as MongooseError, Types } from 'mongoose'
+import { QueryFilter, Error as MongooseError, Types } from 'mongoose'
 import BadRequestError from '../errors/bad-request-error'
 import NotFoundError from '../errors/not-found-error'
 import Order, { IOrder } from '../models/order'
@@ -28,7 +28,7 @@ export const getOrders = async (
             search,
         } = req.query
 
-        const filters: FilterQuery<Partial<IOrder>> = {}
+        const filters: QueryFilter<Partial<IOrder>> = {}
 
         if (status) {
             if (typeof status === 'object') {
@@ -41,14 +41,14 @@ export const getOrders = async (
 
         if (totalAmountFrom) {
             filters.totalAmount = {
-                ...filters.totalAmount,
+                ...(filters.totalAmount as Record<string, any> ?? {}),
                 $gte: Number(totalAmountFrom),
             }
         }
 
         if (totalAmountTo) {
             filters.totalAmount = {
-                ...filters.totalAmount,
+                ...(filters.totalAmount as Record<string, any> ?? {}),
                 $lte: Number(totalAmountTo),
             }
         }
