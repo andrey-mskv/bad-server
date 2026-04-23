@@ -1,3 +1,4 @@
+import 'dotenv-flow/config';
 import { errors } from 'celebrate'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'

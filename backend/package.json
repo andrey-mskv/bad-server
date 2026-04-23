@@ -7,7 +7,7 @@
         "lint": "npx eslint src/**/*.ts",
         "format": "prettier ./src --write",
         "build": "tsc",
-        "dev": "npx nodemon -L src/app.ts ",
+        "dev": "NODE_ENV=development npx nodemon -L src/app.ts ",
         "start": "ts-node src/app.ts",
         "test": "echo \"Error: no test specified\" && exit 1",
         "test:e2e": "bash /tmp/tests-bad-server/bin/run.sh"
@@ -47,6 +47,7 @@
         "cors": "^2.8.5",
         "csurf": "^1.11.0",
         "dotenv": "^16.4.5",
+        "dotenv-flow": "^4.1.0",
         "express": "^4.22.1",
         "helmet": "^8.1.0",
         "jsonwebtoken": "^9.0.2",
@@ -61,6 +62,7 @@
     },
     "overrides": {
         "lodash": "4.18.1",
-        "brace-expansion": "5.0.5"
+        "brace-expansion": "5.0.5",
+        "cookie": "^0.7.0"
     }
 }
