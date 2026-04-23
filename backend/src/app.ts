@@ -36,7 +36,7 @@ app.use(
 // CORS
 app.use(
     cors({
-        origin: ORIGIN_ALLOW || 'http://localhost:3000',
+        origin: ORIGIN_ALLOW || 'http://localhost',
         credentials: true,
         optionsSuccessStatus: 200,
     })

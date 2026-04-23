@@ -9,6 +9,40 @@ services:
       - db:/data/db
     ports:
       - 27018:27017
+    networks:
+      - internal
+
+  backend:
+    restart: always
+    build:
+      context: backend
+    env_file:
+      - backend/.env
+    volumes:
+      - ./backend/src:/app/src
+      - public:/app/src/public
+    ports:
+      - 3000:3000
+    networks:
+      - internal
+    depends_on:
+      - mongo
+
+  server:
+    build:
+      context: nginx
+    ports:
+      - 80:80
+    volumes:
+      - public:/var/public
+    depends_on:
+      - backend
+    networks:
+      - internal
 
 volumes:
+  public:
   db:
+
+networks:
+  internal:
