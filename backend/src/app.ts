@@ -18,7 +18,7 @@ const ORIGIN_ALLOW = process.env.ORIGIN_ALLOW
 
 const app = express()
 
-// helmet(CSP) - от XSS атак
+// helmet - добавляет набор заголовков (Content-Security-Policy)
 app.use(
     helmet({
         contentSecurityPolicy: {
@@ -48,7 +48,7 @@ app.use(urlencoded({ extended: true }))
 app.use(json())
 app.use(express.static(path.join(__dirname, 'public'))) // статика для docker
 
-app.get('/csrf-token', csrfProtection, (req, res) => {
+app.get('/auth/csrf-token', csrfProtection, (req, res) => {
     res.json({ csrfToken: req.csrfToken() });
 });
 
