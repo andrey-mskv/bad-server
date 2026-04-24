@@ -28,27 +28,33 @@ export const getOrders = async (
             search,
         } = req.query
 
+        // Пагинация
+        const normalizedPage = Math.max(Number(page), 1)
+        const normalizedLimit = Math.min(Math.max(Number(limit), 0), 10)
+
         const filters: QueryFilter<Partial<IOrder>> = {}
 
+        // Фильтрация по статусу, диапазону суммы и датам заказа
         if (status) {
-            if (typeof status === 'object') {
-                Object.assign(filters, status)
+            if (typeof status !== 'string') {
+                return res.status(400).json({
+                    message: 'Неверный формат статуса заказа',
+                })
             }
-            if (typeof status === 'string') {
-                filters.status = status
-            }
+
+            filters.status = status
         }
 
         if (totalAmountFrom) {
             filters.totalAmount = {
-                ...(filters.totalAmount as Record<string, any> ?? {}),
+                ...((filters.totalAmount as Record<string, any>) ?? {}),
                 $gte: Number(totalAmountFrom),
             }
         }
 
         if (totalAmountTo) {
             filters.totalAmount = {
-                ...(filters.totalAmount as Record<string, any> ?? {}),
+                ...((filters.totalAmount as Record<string, any>) ?? {}),
                 $lte: Number(totalAmountTo),
             }
         }
@@ -67,6 +73,7 @@ export const getOrders = async (
             }
         }
 
+        // Сложный запрос с агрегацией для фильтрации, сортировки и пагинации заказов
         const aggregatePipeline: any[] = [
             { $match: filters },
             {
@@ -116,8 +123,8 @@ export const getOrders = async (
 
         aggregatePipeline.push(
             { $sort: sort },
-            { $skip: (Number(page) - 1) * Number(limit) },
-            { $limit: Number(limit) },
+            { $skip: (normalizedPage - 1) * normalizedLimit },
+            { $limit: normalizedLimit },
             {
                 $group: {
                     _id: '$_id',
@@ -140,8 +147,8 @@ export const getOrders = async (
             pagination: {
                 totalOrders,
                 totalPages,
-                currentPage: Number(page),
-                pageSize: Number(limit),
+                currentPage: normalizedPage,
+                pageSize: normalizedLimit,
             },
         })
     } catch (error) {

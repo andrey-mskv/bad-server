@@ -1,8 +1,9 @@
 import { Joi, celebrate } from 'celebrate'
 import { Types } from 'mongoose'
+import sanitizeHtml from 'sanitize-html'
 
 // eslint-disable-next-line no-useless-escape
-export const phoneRegExp = /^(\+\d+)?(?:\s|-?|\(?\d+\)?)+$/
+export const phoneRegExp = /^\+?[1-9]\d{9,14}$/
 
 export enum PaymentType {
     Card = 'card',
@@ -35,8 +36,10 @@ export const validateOrderBody = celebrate({
         email: Joi.string().email().required().messages({
             'string.empty': 'Не указан email',
         }),
-        phone: Joi.string().required().pattern(phoneRegExp).messages({
+        phone: Joi.string().required().pattern(phoneRegExp).max(16).messages({
             'string.empty': 'Не указан телефон',
+            'string.pattern.base': 'Некорректный формат телефона',
+            'string.max': 'Слишком длинный телефон',
         }),
         address: Joi.string().required().messages({
             'string.empty': 'Не указан адрес',
@@ -44,7 +47,18 @@ export const validateOrderBody = celebrate({
         total: Joi.number().required().messages({
             'string.empty': 'Не указана сумма заказа',
         }),
-        comment: Joi.string().optional().allow(''),
+        comment: Joi.string()
+            .trim()
+            .max(500)
+            .allow('')
+            .optional()
+            .custom((value) => {
+                if (!value) return value
+                return sanitizeHtml(value, {
+                    allowedTags: [],
+                    allowedAttributes: {},
+                })
+            }),
     }),
 })
 
