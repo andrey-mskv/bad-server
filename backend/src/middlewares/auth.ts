@@ -16,10 +16,12 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
         throw new UnauthorizedError('Невалидный токен')
     }
     try {
+        // Декодирование и верификация JWT
         const accessTokenParts = authHeader.split(' ')
         const aTkn = accessTokenParts[1]
         payload = jwt.verify(aTkn, ACCESS_TOKEN.secret) as JwtPayload
 
+        // Поиск пользователя в базе
         const user = await UserModel.findOne(
             {
                 _id: new Types.ObjectId(payload.sub),
@@ -30,6 +32,7 @@ const auth = async (req: Request, res: Response, next: NextFunction) => {
         if (!user) {
             return next(new ForbiddenError('Нет доступа'))
         }
+        // Проброс данных пользователя в res.locals
         res.locals.user = user
 
         return next()

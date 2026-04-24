@@ -21,7 +21,7 @@ services:
       - internal
 
   backend:
-    restart: always
+    restart: unless-stopped
     build:
       context: backend
     env_file:
