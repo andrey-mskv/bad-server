@@ -14,7 +14,7 @@ const cache = apicache.middleware;
 
 router.use('/auth', authRouter)
 router.use('/product', cache('2 minutes'), productRouter)
-router.use('/order', auth, cache('5 minutes'), orderRouter)
+router.use('/order', auth, orderRouter)
 router.use('/upload', auth, uploadRouter)
 router.use('/customers', auth, cache('2 minutes'), customerRouter)
 
