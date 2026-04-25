@@ -36,10 +36,11 @@ export const validateOrderBody = celebrate({
         email: Joi.string().email().required().messages({
             'string.empty': 'Не указан email',
         }),
-        phone: Joi.string().required().pattern(phoneRegExp).max(16).messages({
+        phone: Joi.string()
+        .required()
+        .pattern(phoneRegExp).messages({
             'string.empty': 'Не указан телефон',
             'string.pattern.base': 'Некорректный формат телефона',
-            'string.max': 'Слишком длинный телефон',
         }),
         address: Joi.string().required().messages({
             'string.empty': 'Не указан адрес',
