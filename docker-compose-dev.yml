@@ -1,12 +1,4 @@
 services:
-  frontend:
-    build:
-      context: frontend
-    env_file:
-      - frontend/.env
-    volumes:
-      - frontend:/app/frontend/dist
-
   mongo:
     image: mongo
     restart: always
@@ -21,7 +13,7 @@ services:
       - internal
 
   backend:
-    restart: unless-stopped
+    restart: always
     build:
       context: backend
     env_file:
@@ -35,14 +27,6 @@ services:
       - internal
     depends_on:
       - mongo
-  #     - redis
-  #   environment:
-  #     REDIS_URL: redis://redis:6379
-
-  # redis:
-  #   image: redis:7
-  #   ports:
-  #     - "6379:6379"
 
   server:
     build:
@@ -50,16 +34,13 @@ services:
     ports:
       - 80:80
     volumes:
-      - frontend:/var/app
       - public:/var/public
     depends_on:
-      - frontend
       - backend
     networks:
       - internal
 
 volumes:
-  frontend:
   public:
   db:
 

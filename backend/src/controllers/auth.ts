@@ -13,15 +13,20 @@ import User from '../models/user'
 // POST /auth/login
 const login = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        // Извлечение данных из тела запроса
         const { email, password } = req.body
+        // Аутентификация пользователя
         const user = await User.findUserByCredentials(email, password)
+        // Генерация accessToken и refreshToken
         const accessToken = user.generateAccessToken()
         const refreshToken = await user.generateRefreshToken()
+        // Установка refreshToken в HTTP-only cookie
         res.cookie(
             REFRESH_TOKEN.cookie.name,
             refreshToken,
             REFRESH_TOKEN.cookie.options
         )
+        // Возвращение данных пользователя и accessToken в ответе
         return res.json({
             success: true,
             user,

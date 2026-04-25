@@ -1,28 +1,59 @@
+import 'dotenv-flow/config';
 import { errors } from 'celebrate'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import 'dotenv/config'
 import express, { json, urlencoded } from 'express'
 import mongoose from 'mongoose'
+
 import path from 'path'
 import { DB_ADDRESS } from './config'
 import errorHandler from './middlewares/error-handler'
-import serveStatic from './middlewares/serverStatic'
+// import serveStatic from './middlewares/serverStatic'
 import routes from './routes'
+import helmet from 'helmet'
+import csrf from 'csurf'
+import { limiter } from './middlewares/limiter';
 
 const { PORT = 3000 } = process.env
+const ORIGIN_ALLOW = process.env.ORIGIN_ALLOW
+
 const app = express()
 
+// helmet - добавляет набор заголовков (Content-Security-Policy)
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                imgSrc: ["'self'", 'data:'],
+                scriptSrc: ["'self'"],
+                styleSrc: ["'self'"],
+                fontSrc: ["'self'"],
+            },
+        },
+    })
+)
+
+// CORS
+app.use(
+    cors({
+        origin: ORIGIN_ALLOW || 'http://localhost',
+        credentials: true,
+        optionsSuccessStatus: 200,
+    })
+)
+
 app.use(cookieParser())
-
-app.use(cors())
-// app.use(cors({ origin: ORIGIN_ALLOW, credentials: true }));
-// app.use(express.static(path.join(__dirname, 'public')));
-
-app.use(serveStatic(path.join(__dirname, 'public')))
-
+app.use(limiter) // Ограничение количества запросов от одного IP-адреса
+const csrfProtection = csrf({ cookie: true });
 app.use(urlencoded({ extended: true }))
 app.use(json())
+app.use(express.static(path.join(__dirname, 'public'))) // статика для docker
+
+app.get('/auth/csrf-token', csrfProtection, (req, res) => {
+    res.json({ csrfToken: req.csrfToken() });
+});
 
 app.options('*', cors())
 app.use(routes)

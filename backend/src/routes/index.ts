@@ -7,14 +7,16 @@ import customerRouter from './customers'
 import orderRouter from './order'
 import productRouter from './product'
 import uploadRouter from './upload'
+import apicache from 'apicache'
 
 const router = Router()
+const cache = apicache.middleware;
 
 router.use('/auth', authRouter)
-router.use('/product', productRouter)
+router.use('/product', cache('2 minutes'), productRouter)
 router.use('/order', auth, orderRouter)
 router.use('/upload', auth, uploadRouter)
-router.use('/customers', auth, customerRouter)
+router.use('/customers', auth, cache('2 minutes'), customerRouter)
 
 router.use((_req: Request, _res: Response, next: NextFunction) => {
     next(new NotFoundError('Маршрут не найден'))
