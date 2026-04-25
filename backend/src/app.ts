@@ -13,6 +13,7 @@ import errorHandler from './middlewares/error-handler'
 import routes from './routes'
 import helmet from 'helmet'
 import csrf from 'csurf'
+import { limiter } from './middlewares/limiter';
 
 const { PORT = 3000 } = process.env
 const ORIGIN_ALLOW = process.env.ORIGIN_ALLOW
@@ -44,6 +45,7 @@ app.use(
 )
 
 app.use(cookieParser())
+app.use(limiter) // Ограничение количества запросов от одного IP-адреса
 const csrfProtection = csrf({ cookie: true });
 app.use(urlencoded({ extended: true }))
 app.use(json())

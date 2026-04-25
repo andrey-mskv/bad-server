@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from 'express'
 import { constants } from 'http2'
 import BadRequestError from '../errors/bad-request-error'
 
+console.log('UPLOAD PATH:', process.env.UPLOAD_PATH)
+
 export const uploadFile = async (
     req: Request,
     res: Response,
@@ -16,7 +18,7 @@ export const uploadFile = async (
             : `/${req.file?.filename}`
         return res.status(constants.HTTP_STATUS_CREATED).send({
             fileName,
-            originalName: req.file?.originalname,
+            originalName: req.file?.filename,
         })
     } catch (error) {
         return next(error)
