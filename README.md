@@ -13,3 +13,5 @@ docker compose up -d
 6. Админка находится по адресу http://localhost/admin/
 
 ## https://github.com/andrey-mskv/bad-server
+Москвин Андрей
+Когорта 41
